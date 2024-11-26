@@ -351,7 +351,10 @@ export default defineComponent({
     }
 
     function isCreateDisabled() {
-      return !newMeal.recipeId || dialog.note && !newMeal.title.trim();
+      if (dialog.note) {
+        return !newMeal.title.trim();
+      }
+      return !newMeal.recipeId;
     };
 
     async function randomMeal(date: Date, type: PlanEntryType) {
