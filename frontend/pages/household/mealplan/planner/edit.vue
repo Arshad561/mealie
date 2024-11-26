@@ -22,6 +22,7 @@
         resetDialog();
       "
       @close="resetDialog()"
+      :submitDisabled="isCreateDisabled()"
     >
       <v-card-text>
         <v-menu
@@ -70,9 +71,10 @@
             item-text="name"
             item-value="id"
             :return-object="false"
+            :rules="[requiredRule]"
           />
           <template v-else>
-            <v-text-field v-model="newMeal.title" :label="$t('meal-plan.meal-title')" />
+            <v-text-field v-model="newMeal.title" :rules="[requiredRule]" :label="$t('meal-plan.meal-title')" />
             <v-textarea v-model="newMeal.text" rows="2" :label="$t('meal-plan.meal-note')" />
           </template>
         </v-card-text>
@@ -253,6 +255,7 @@ export default defineComponent({
     const api = useUserApi();
     const { $auth } = useContext();
     const { household } = useHouseholdSelf();
+    const requiredRule = (value: any) => !!value || "Required."
 
     const state = ref({
       dialog: false,
@@ -347,6 +350,10 @@ export default defineComponent({
       newMeal.existing = false;
     }
 
+    function isCreateDisabled() {
+      return !newMeal.recipeId || dialog.note && !newMeal.title.trim();
+    };
+
     async function randomMeal(date: Date, type: PlanEntryType) {
       const { data } = await api.mealplans.setRandom({
         date: format(date, "yyyy-MM-dd"),
@@ -373,6 +380,8 @@ export default defineComponent({
       onMoveCallback,
       planTypeOptions,
       getEntryTypeText,
+      requiredRule,
+      isCreateDisabled,
 
       // Dialog
       dialog,
