@@ -22,7 +22,7 @@
         resetDialog();
       "
       @close="resetDialog()"
-      :submitDisabled="isCreateDisabled()"
+      :submitDisabled="isCreateDisabled"
     >
       <v-card-text>
         <v-menu
@@ -318,6 +318,14 @@ export default defineComponent({
       userId: $auth.user?.id || "",
     });
 
+    const isCreateDisabled = computed(() => {
+      if (dialog.note) {
+        return !newMeal.title.trim();
+      }
+      return !newMeal.recipeId;
+    });
+
+
     function openDialog(date: Date) {
       newMeal.date = format(date, "yyyy-MM-dd");
       state.value.dialog = true;
@@ -349,13 +357,6 @@ export default defineComponent({
       newMeal.recipeId = undefined;
       newMeal.existing = false;
     }
-
-    function isCreateDisabled() {
-      if (dialog.note) {
-        return !newMeal.title.trim();
-      }
-      return !newMeal.recipeId;
-    };
 
     async function randomMeal(date: Date, type: PlanEntryType) {
       const { data } = await api.mealplans.setRandom({
